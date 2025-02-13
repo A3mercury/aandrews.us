@@ -23,6 +23,7 @@ func setupRouter() *gin.Engine {
 		)
 	})
 
+	// Blog Posts
 	router.GET("/blog-posts", controllers.FindBlogPosts)
 	router.POST("/blog-post", controllers.CreateBook)
 	router.GET("/blog-post/:id", controllers.FindBlogPost)
@@ -33,8 +34,6 @@ func setupRouter() *gin.Engine {
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
-
-	router.GET("/books", controllers.FindBooks)
 
 	router.LoadHTMLGlob("templates/*")
 
