@@ -1,12 +1,9 @@
-import type { FC } from "react";
-import type { Route } from "./+types/blog-post";
-import Header from "../components/header";
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { useParams } from "react-router";
+import Header from "../Components/Header";
 
-const BlogPost: FC<Route.ComponentProps> = ({
-    params,
-}) => {
-    console.log(params?.title);
+export default function BlogPost() {
+    let params = useParams();
+    console.log(params);
 
     return (
         <div>
@@ -33,5 +30,3 @@ const BlogPost: FC<Route.ComponentProps> = ({
         </div>
     );
 }
-
-export default BlogPost;

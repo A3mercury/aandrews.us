@@ -26,7 +26,7 @@ func setupRouter() *gin.Engine {
 	// Blog Posts
 	router.GET("/blog-posts", controllers.FindBlogPosts)
 	router.POST("/blog-post", controllers.CreateBook)
-	router.GET("/blog-post/:id", controllers.FindBlogPost)
+	router.GET("/blog-post/:unique_url", controllers.FindBlogPost)
 	router.PATCH("/blog-post/:id", controllers.UpdateBlogPost)
 	router.DELETE("/blog-post/:id", controllers.DeleteBlogPost)
 

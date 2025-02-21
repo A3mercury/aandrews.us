@@ -16,7 +16,7 @@ func FindBlogPosts(c *gin.Context) {
 func FindBlogPost(c *gin.Context) {
 	var blogPost models.BlogPost
 
-	if err := models.DB.Where("id = ?", c.Param("id")).First(&blogPost).Error; err != nil {
+	if err := models.DB.Where("unique_url = ?", c.Param("unique_url")).First(&blogPost).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found."})
 		return
 	}
@@ -32,8 +32,19 @@ func CreateBook(c *gin.Context) {
 		return
 	}
 
+	var blogPost models.BlogPost
+	if err := models.DB.Where("unique_url = ?", input.UniqueUrl).First(&blogPost).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unique URL is already in use."})
+		return
+	}
+
 	// create blog post
-	post := models.BlogPost{Title: input.Title, Content: input.Content, Category: input.Category}
+	post := models.BlogPost{
+		Title:     input.Title,
+		UniqueUrl: input.UniqueUrl,
+		Content:   input.Content,
+		Category:  input.Category,
+	}
 	models.DB.Create(&post)
 
 	c.JSON(http.StatusOK, gin.H{"data": post})
