@@ -1,7 +1,21 @@
+import { useEffect, useState } from "react";
 import Header from "../Components/Header";
 import PostDateTitle from "../Components/PostDateTitle";
+import moment from "moment";
+import { PostType } from "../Interfaces/interfaces";
 
 export default function BlogHome() {
+    const [posts, setPosts] = useState<PostType[]>([]);
+
+    useEffect(() => {
+        fetch("http://localhost:8080/blog-posts")
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res);
+                setPosts(res.data);
+            })
+    }, []);
+
     return (
         <>
             <Header />
@@ -11,27 +25,17 @@ export default function BlogHome() {
             </div>
 
             <div className="mx-auto max-w-4xl px-6 py-8 lg:px-8">
-                {/* items */}
-                <PostDateTitle 
-                    date="Feb. 14, 2025" 
-                    title="Some Title for a Blog Post Entry" 
-                    url="some-title-for-a-blog-post-entry"
-                />
-                <PostDateTitle 
-                    date="Feb. 02, 2025" 
-                    title="Beginning of the End" 
-                    url="beginning-of-the-end"
-                />
-                <PostDateTitle 
-                    date="Jan. 18, 2025" 
-                    title="Ai Systems you Probably Should Care About" 
-                    url="ai-systems-you-probably-should-care-about"
-                />
-                <PostDateTitle 
-                    date="Jan. 18, 2025" 
-                    title="What if one is really long and annoying, what happens then?" 
-                    url="what-if-one-is-really-long-and-annoying-what-happens-then"
-                />
+
+                {posts.map(post => {
+                    return (
+                        <PostDateTitle 
+                            key={post.unique_url} 
+                            date={!post.published_at ? '' : moment(post.published_at).format('ll')} 
+                            title={post.title} 
+                            url={post.unique_url} 
+                        />
+                    );
+                })}
             </div>
         </>
     );

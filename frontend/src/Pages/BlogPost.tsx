@@ -1,9 +1,21 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import Header from "../Components/Header";
+import { PostType } from "../Interfaces/interfaces";
+import moment from "moment";
 
 export default function BlogPost() {
     let params = useParams();
-    console.log(params);
+    console.log(params.title);
+    const [post, setPost] = useState<PostType>();
+
+    useEffect(() => {
+        fetch("http://localhost:8080/blog-post/"+params.title)
+            .then((res) => res.json())
+            .then((res) => {
+                setPost(res.data);
+            })
+    }, []);
 
     return (
         <div>
@@ -11,9 +23,9 @@ export default function BlogPost() {
 
             <div className="mx-auto max-w-4xl px-6 py-8 lg:px-8">
                 <h1 className="text-4xl font-bold">
-                    Some Title for a Blog Post Entry
+                    {post?.title}
                 </h1>
-                <p className="text-gray-400 text-[9pt]">14 February, 2025 • 6 min</p>
+                <p className="text-gray-400 text-[9pt]">{moment(post?.published_at).format('ll')} • 6 min</p>
 
                 <p className="text-gray-400 text-[8pt] mt-16">CHAPTER 1</p>
                 <h2 className="text-xl font-medium">

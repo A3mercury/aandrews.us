@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"aandrews.us/models"
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,7 @@ import (
 
 func FindBlogPosts(c *gin.Context) {
 	var blogPosts []models.BlogPost
-	models.DB.Find(&blogPosts)
+	models.DB.Preload("Content").Find(&blogPosts)
 	c.JSON(http.StatusOK, gin.H{"data": blogPosts})
 }
 
@@ -24,7 +25,7 @@ func FindBlogPost(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": blogPost})
 }
 
-func CreateBook(c *gin.Context) {
+func CreateBlogPost(c *gin.Context) {
 	// validate input
 	var input models.CreateBlogPostInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -40,11 +41,16 @@ func CreateBook(c *gin.Context) {
 
 	// create blog post
 	post := models.BlogPost{
-		Title:     input.Title,
-		UniqueUrl: input.UniqueUrl,
-		Content:   input.Content,
-		Category:  input.Category,
+		Title:       input.Title,
+		UniqueUrl:   input.UniqueUrl,
+		Category:    input.Category,
+		PublishedAt: time.Now().Format(time.RFC3339),
 	}
+	post.Content = make([]models.BlogPostContent, 0)
+	for index, item := range input.Content {
+		post.Content = append(post.Content, models.BlogPostContent{Key: item.Key, Value: item.Value, Order: index})
+	}
+
 	models.DB.Create(&post)
 
 	c.JSON(http.StatusOK, gin.H{"data": post})
@@ -65,9 +71,26 @@ func UpdateBlogPost(c *gin.Context) {
 		return
 	}
 
-	models.DB.Model(&post).Updates(input)
+	updatedPost := models.BlogPost{
+		ID:        post.ID,
+		Title:     input.Title,
+		UniqueUrl: input.UniqueUrl,
+		Category:  input.Category,
+	}
 
-	c.JSON(http.StatusOK, gin.H{"data": post})
+	var blogPostContent models.BlogPostContent
+	models.DB.Where("blog_post_id = ?", updatedPost.ID).Delete(&blogPostContent)
+
+	content := make([]models.BlogPostContent, 0)
+	for index, item := range input.Content {
+		content = append(content, models.BlogPostContent{Key: item.Key, Value: item.Value, Order: index, BlogPostID: updatedPost.ID})
+	}
+
+	models.DB.Create(&content)
+	updatedPost.Content = content
+	models.DB.Model(&post).Updates(updatedPost)
+
+	c.JSON(http.StatusOK, gin.H{"data": updatedPost})
 }
 
 func DeleteBlogPost(c *gin.Context) {
