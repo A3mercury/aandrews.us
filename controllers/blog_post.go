@@ -103,5 +103,8 @@ func DeleteBlogPost(c *gin.Context) {
 
 	models.DB.Delete(&post)
 
+	var postContent []models.BlogPostContent
+	models.DB.Delete(&postContent, "blog_post_id = ?", c.Param("id"))
+
 	c.JSON(http.StatusOK, gin.H{"data": true})
 }
