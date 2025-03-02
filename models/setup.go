@@ -17,8 +17,8 @@ func ConnectDatabase() {
 	}
 
 	database.AutoMigrate(User{})
-	database.AutoMigrate(BlogPost{})
 	database.AutoMigrate(BlogPostContent{})
+	database.AutoMigrate(BlogPost{})
 
 	DB = database
 
@@ -26,6 +26,12 @@ func ConnectDatabase() {
 }
 
 func registerRootUser() {
+	// Check to see if user exists already
+	var existingUser User
+	if err := DB.Where("username = ?", os.Getenv("ROOT_USER_USERNAME")).First(&existingUser).Error; err == nil {
+		return
+	}
+
 	createUser := CreateUser{
 		Username: os.Getenv("ROOT_USER_USERNAME"),
 		Password: os.Getenv("ROOT_USER_PASSWORD"),

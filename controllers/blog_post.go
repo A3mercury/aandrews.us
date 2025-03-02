@@ -17,7 +17,7 @@ func FindBlogPosts(c *gin.Context) {
 func FindBlogPost(c *gin.Context) {
 	var blogPost models.BlogPost
 
-	if err := models.DB.Where("unique_url = ?", c.Param("unique_url")).First(&blogPost).Error; err != nil {
+	if err := models.DB.Where("unique_url = ?", c.Param("unique_url")).Preload("Content").First(&blogPost).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found."})
 		return
 	}
@@ -48,7 +48,18 @@ func CreateBlogPost(c *gin.Context) {
 	}
 	post.Content = make([]models.BlogPostContent, 0)
 	for index, item := range input.Content {
-		post.Content = append(post.Content, models.BlogPostContent{Key: item.Key, Value: item.Value, Order: index})
+		content := models.BlogPostContent{
+			Key:    item.Key,
+			Value:  item.Value,
+			Order:  index,
+			Src:    item.Src,
+			Alt:    item.Alt,
+			Width:  item.Width,
+			Height: item.Height,
+			Href:   item.Href,
+		}
+
+		post.Content = append(post.Content, content)
 	}
 
 	models.DB.Create(&post)

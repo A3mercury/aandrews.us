@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import Header from "../Components/Header";
 import { PostType } from "../Interfaces/interfaces";
@@ -6,16 +6,47 @@ import moment from "moment";
 
 export default function BlogPost() {
     let params = useParams();
-    console.log(params.title);
     const [post, setPost] = useState<PostType>();
 
     useEffect(() => {
-        fetch("http://localhost:8080/blog-post/"+params.title)
+        fetch("http://localhost:8080/api/blog-post/"+params.title)
             .then((res) => res.json())
             .then((res) => {
                 setPost(res.data);
             })
     }, []);
+
+    function parseTextWithLinks(text: string): (string | JSX.Element)[] {
+        const linkReg = /\[(.*?)\]\((.*?)\)/g;
+        const elements: (string | JSX.Element)[] = [];
+        let lastIndex = 0;
+        let match;
+
+        while ((match = linkReg.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+                elements.push(text.slice(lastIndex, match.index));
+            }
+
+            elements.push(
+                <a
+                    key={match.index} 
+                    href={match[2]} 
+                    target="_blank"
+                    className="text-[10pt]/8 font-serif text-blue-400 underline"
+                >
+                    {match[1]}
+                </a>
+            );
+
+            lastIndex = linkReg.lastIndex;
+        }
+
+        if (lastIndex < text.length) {
+            elements.push(text.slice(lastIndex));
+        }
+
+        return elements;
+    }
 
     return (
         <div>
@@ -27,17 +58,38 @@ export default function BlogPost() {
                 </h1>
                 <p className="text-gray-400 text-[9pt]">{moment(post?.published_at).format('ll')} • 6 min</p>
 
-                <p className="text-gray-400 text-[8pt] mt-16">CHAPTER 1</p>
-                <h2 className="text-xl font-medium">
-                    So what are we even talking about?
-                </h2>
-                <p className="text-[10pt]/8 py-2 font-serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eu nibh urna. Aenean mattis porta scelerisque. Ut porta rutrum nisl, sed condimentum justo rutrum nec. Proin nec molestie mi. Maecenas in odio eu felis volutpat pretium pharetra vel risus. Nunc ultrices pellentesque ipsum nec vehicula. Donec pretium at nisl a eleifend. Maecenas at fermentum lorem. Aenean ut tincidunt ipsum. Mauris nec gravida elit. Duis porta vel massa vel sagittis. Mauris condimentum, tortor a dictum pulvinar, tellus dui scelerisque orci, a porttitor arcu lacus quis dolor. In consectetur faucibus sodales. Integer mauris libero, vestibulum et elit ac, ornare mollis ipsum. Nunc at ultricies turpis.</p>
-                <p className="text-[10pt]/8 py-2 font-serif">Nunc efficitur orci turpis, et bibendum elit venenatis at. Morbi aliquam aliquam sollicitudin. Praesent pretium eleifend erat vel cursus. Sed sollicitudin rutrum aliquam. Sed varius vel odio eu volutpat. Donec commodo sollicitudin sem, dignissim porta metus tristique eu. Nulla vitae massa nec nisi gravida tincidunt eu vitae orci. Etiam a porta nibh. Phasellus eget rhoncus turpis. Fusce viverra magna vitae leo tempus laoreet quis non ex. Quisque placerat dapibus gravida. Donec a luctus felis, sed mattis ipsum. Ut ut odio rutrum, cursus nisi nec, elementum sapien.</p>
-
-                <div className="flex mt-20">
-                    <div className="bg-gray-200 p-3 rounded-xl mr-6 text-[9pt] font-semibold">web development</div>
-                    <div className="bg-gray-200 p-3 rounded-xl mr-6 text-[9pt] font-semibold">cryptography</div>
-                </div>
+                {post?.content.map(part => {
+                    if (part?.key === "h1") {
+                        return <h1 className="text-4xl font-medium py-2">{part?.value}</h1>
+                    }
+                    if (part?.key === "h2") {
+                        return <h2 className="text-3xl font-medium py-2">{part?.value}</h2>
+                    }
+                    if (part?.key === "h3") {
+                        return <h3 className="text-2xl font-medium py-2">{part?.value}</h3>
+                    }
+                    if (part?.key === "h4") {
+                        return <h4 className="text-xl font-medium py-2">{part?.value}</h4>
+                    }
+                    if (part?.key === "h5") {
+                        return <h5 className="text-lg font-medium py-2">{part?.value}</h5>
+                    }
+                    if (part?.key === "h6") {
+                        return <h6 className="text-md font-medium py-2">{part?.value}</h6>
+                    }
+                    if (part?.key === "p") {
+                        return <p className="text-[10pt]/8 py-2 font-serif">
+                            {parseTextWithLinks(part?.value)}
+                        </p>
+                    }
+                    if (part?.key === "a") {
+                        return <a href={part?.href} className="text-[10pt]/8 font-serif text-blue-400 underline">{part?.value}</a>
+                    }
+                    if (part?.key === "img") {
+                        return <img src="https://www.w3schools.com/html/pic_trulli.jpg" alt={part?.alt} width={part?.width} height={part?.height} />
+                    }
+                })}
+                
             </div>
         </div>
     );

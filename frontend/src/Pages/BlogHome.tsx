@@ -8,10 +8,9 @@ export default function BlogHome() {
     const [posts, setPosts] = useState<PostType[]>([]);
 
     useEffect(() => {
-        fetch("http://localhost:8080/blog-posts")
+        fetch("http://localhost:8080/api/blog-posts")
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 setPosts(res.data);
             })
     }, []);

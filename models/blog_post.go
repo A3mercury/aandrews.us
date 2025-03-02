@@ -37,4 +37,9 @@ type BlogPostContent struct {
 	Order      int    `json:"order"`
 	Key        string `json:"key"`
 	Value      string `json:"value"`
+	Href       string `json:"href"`
+	Src        string `json:"src"`
+	Alt        string `json:"alt"`
+	Width      int    `json:"width"`
+	Height     int    `json:"height"`
 }
