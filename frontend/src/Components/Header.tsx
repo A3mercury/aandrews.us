@@ -11,7 +11,7 @@ export default function Header() {
                 <div className="flex">
                     <Menu as="div" className="relative inline-block text-left">
                         <div>
-                            <MenuButton className="flex items-center rounded-full bg-gray-100 text-black hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+                            <MenuButton className="flex items-center rounded-full text-black">
                                 <span className="sr-only">Open options</span>
                                 <Bars3Icon aria-hidden="true" className="size-10" />
                             </MenuButton>
@@ -24,7 +24,7 @@ export default function Header() {
                             <div className="py-1">
                                 <MenuItem>
                                     <a
-                                    href="#"
+                                    href="/blogs"
                                     className="block px-4 py-4 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none border-b-1 border-gray-200"
                                     >
                                         Blog Posts
@@ -32,7 +32,7 @@ export default function Header() {
                                 </MenuItem>
                                 <MenuItem>
                                     <a
-                                    href="#"
+                                    href="/about"
                                     className="block px-4 py-4 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none border-b-1 border-gray-200"
                                     >
                                         About
@@ -40,7 +40,7 @@ export default function Header() {
                                 </MenuItem>
                                 <MenuItem>
                                     <a
-                                    href="#"
+                                    href="/contact"
                                     className="block px-4 py-4 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
                                     >
                                         Contact
